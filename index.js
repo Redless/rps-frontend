@@ -2,6 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+let url = 
+    //"http://127.0.0.1:5000/";
+    "https://littlerps.herokuapp.com/";
+
 class Room extends React.Component {
     render() {
 	return (
@@ -22,19 +26,20 @@ class Manager extends React.Component {
 	super();
 	this.state = {
 	    ingame:false,
-	    gamein:-99,
+	    gamein:null,
 	    side:0,
 	}
     }
 
     setPlayerInRoom(room,side) {
 	this.setState({side:side,ingame:true});
+	this.setState({gamein:(<GameViewer side={side}/>)})
     }
 
     render(){
 	if (this.state.ingame) {
 	    return (<div>
-		<GameViewer side={this.state.side}/>
+		{this.state.gamein}
 		</div>)
 	} else {
 	    return (
@@ -59,7 +64,7 @@ constructor() {
   }
 
     tick() {
-      fetch('http://127.0.0.1:5000/').then(response => {return response.json()}).then(json => {this.updateScores(json.p1score,json.p2score)})
+      fetch(url).then(response => {return response.json()}).then(json => {this.updateScores(json.p1score,json.p2score)})
     }
 
     updateScores(score1,score2){
@@ -67,7 +72,8 @@ constructor() {
     }
 
     send(choice) {
-      fetch('http://127.0.0.1:5000/', {
+      console.log(this.props.side,choice)
+      fetch(url, {
         method:"POST",
         cache: "no-cache",
         headers:{
