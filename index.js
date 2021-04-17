@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 let url = 
-    //"http://127.0.0.1:5000/";
-    "https://littlerps.herokuapp.com/";
+    "http://127.0.0.1:5000/";
+    //"https://littlerps.herokuapp.com/";
 
 class Room extends React.Component {
     render() {
@@ -32,7 +32,7 @@ class Manager extends React.Component {
     }
 
     setPlayerInRoom(room,side) {
-	this.setState({side:side,ingame:true});
+	this.setState({side:side,ingame:true,gamein:room});
 	this.setState({gamein:(<GameViewer side={side}/>)})
     }
 
@@ -58,21 +58,32 @@ constructor() {
     );
 
     this.state = {
-	p1score:0,
-	p2score:0,
+	fightactive: false,
+	team: "",
+	activemon: "",
+	activehealth: 0,
+	foeactive: "",
+	foehealth: 0,
+	activemoves: [],
+	switches: []
     }
+    this.handleChange = this.handleChange.bind(this);
   }
 
     tick() {
-      fetch(url).then(response => {return response.json()}).then(json => {this.updateScores(json.p1score,json.p2score)})
+      fetch(url).then(response => {return response.json()}).then(json => {this.setDisplay(json)})
     }
 
-    updateScores(score1,score2){
-	this.setState({p1score:score1,p2score:score2})
+    setDisplay(json) {
+	this.setState({fightactive: json.fightactive})
+	if (this.props.side == 0) {
+	    this.setState({activemon: json.p1mon,activehealth: json.p1health,foeactive: json.p2mon,foehealth: json.p2health,activemoves: json.p1moves, switches: json.p1switches})
+	} else {
+	    this.setState({activemon: json.p2mon,activehealth: json.p2health,foeactive: json.p1mon,foehealth: json.p1health,activemoves: json.p2moves, switches: json.p2switches})
+	}
     }
 
     send(choice) {
-      console.log(this.props.side,choice)
       fetch(url, {
         method:"POST",
         cache: "no-cache",
@@ -89,23 +100,49 @@ constructor() {
 	console.log(choice)
     }
 
-  renderOptionButton(option) {
+    sendteam() {
+	fetch(url, {
+        method:"POST",
+        cache: "no-cache",
+        headers:{
+            "content_type":"application/json",
+        },
+	    body:JSON.stringify({type:"team",side:this.props.side,...JSON.parse(this.state.team)})
+        }
+    ).then(response => {
+    return response.json()
+  })
+  .then(json => {console.log(json)})
+	console.log("sent")
+    }
+
+
+
+  renderSubmitButton() {
       return (
-	  <button className="optionbutton" onClick={() => this.send(option)}>
-	  {option}
+	  <button className="submitbutton" onClick={() => this.sendteam()}>
+	  Submit Team
 	  </button>)
 
   }
+handleChange(event) {this.setState({team: event.target.value});}
 
   render() {
+      if (this.state.fightactive) {
+	return (
+	    <div>
+	    {this.state.activemon} VS {this.state.foeactive}
+	    </div>);
+      } else {
+
     return (
       <div className="game">
-	{this.renderOptionButton("rock")}
-	{this.renderOptionButton("paper")}
-	{this.renderOptionButton("scissors")}
-	{this.state.p1score}{this.state.p2score}
+	{"Paste Team Below"}
+	<textarea value={this.state.team} onChange={this.handleChange} />
+	{this.renderSubmitButton()}
       </div>
     );
+      }
   }
 }
 
