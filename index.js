@@ -74,13 +74,35 @@ constructor() {
       fetch(url).then(response => {return response.json()}).then(json => {this.setDisplay(json)})
     }
 
+    renderOptions() {
+	if (this.state.activemoves) {
+	return (<div>
+	    {this.state.activemoves.map((value, index) => {
+        return <button onClick={() => this.sendMove(index)}>{value}</button>})}
+	    {this.state.switches.map((value, index) => {
+        return <button onClick={() => this.sendSwitch(index)}>{value}</button>})}
+	</div>);
+	} else {
+	return (<div>
+	    {this.state.switches.map((value, index) => {
+        return <button onClick={() => this.sendSwitch(index)}>{value}</button>})}
+	</div>);
+
+
+	}
+
+    }
+
     setDisplay(json) {
-	this.setState({fightactive: json.fightactive})
+	console.log("here's the json")
+	console.log(json)
+	console.log("that was it.")
 	if (this.props.side == 0) {
 	    this.setState({activemon: json.p1mon,activehealth: json.p1health,foeactive: json.p2mon,foehealth: json.p2health,activemoves: json.p1moves, switches: json.p1switches})
 	} else {
 	    this.setState({activemon: json.p2mon,activehealth: json.p2health,foeactive: json.p1mon,foehealth: json.p1health,activemoves: json.p2moves, switches: json.p2switches})
 	}
+	this.setState({fightactive: json.fightactive})
     }
 
     send(choice) {
@@ -98,6 +120,27 @@ constructor() {
   .then(json => {console.log(json)})
 	console.log("sent")
 	console.log(choice)
+    }
+    sendMove(move){
+	fetch(url, {
+        method:"POST",
+        cache: "no-cache",
+        headers:{
+            "content_type":"application/json",
+        },
+	    body:JSON.stringify({type:"move",move:move,side:this.props.side})
+        })
+    }
+
+    sendSwitch(mon){
+	fetch(url, {
+        method:"POST",
+        cache: "no-cache",
+        headers:{
+            "content_type":"application/json",
+        },
+	    body:JSON.stringify({type:"swap",mon:mon,side:this.props.side})
+        })
     }
 
     sendteam() {
@@ -130,9 +173,11 @@ handleChange(event) {this.setState({team: event.target.value});}
   render() {
       if (this.state.fightactive) {
 	return (
-	    <div>
-	    {this.state.activemon} VS {this.state.foeactive}
-	    </div>);
+	    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gridGap: 20 }}>
+	    <div><h2>{this.state.activemon}</h2><p>{this.state.activehealth}</p>{this.renderOptions()}</div>
+	    <div><h2>{this.state.foeactive}</h2><p>{this.state.foehealth}</p></div>
+    <div>Column 3</div>
+  </div>);
       } else {
 
     return (
