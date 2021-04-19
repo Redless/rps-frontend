@@ -65,7 +65,9 @@ constructor() {
 	foeactive: "",
 	foehealth: 0,
 	activemoves: [],
-	switches: []
+	switches: [],
+	fightfinished: "",
+	fightwinner: ""
     }
     this.handleChange = this.handleChange.bind(this);
   }
@@ -94,9 +96,11 @@ constructor() {
     }
 
     setDisplay(json) {
-	console.log("here's the json")
-	console.log(json)
-	console.log("that was it.")
+	if ((json.winner == "p1") || (json.winner == "p2")) {
+	    console.log("FIGHT FINISHED")
+	    this.setState({fightfinished: true,fightwinner: json.winner})
+	    return
+	}
 	if (this.props.side == 0) {
 	    this.setState({activemon: json.p1mon,activehealth: json.p1health,foeactive: json.p2mon,foehealth: json.p2health,activemoves: json.p1moves, switches: json.p1switches})
 	} else {
@@ -178,6 +182,15 @@ handleChange(event) {this.setState({team: event.target.value});}
 	    <div><h2>{this.state.foeactive}</h2><p>{this.state.foehealth}</p></div>
     <div>Column 3</div>
   </div>);
+      } else if (this.state.fightfinished) {
+	  console.log("printin out that fight finished!")
+	  return (<div>
+	      Game over!
+	      Congratulations!
+	      Winner is:
+	      {" "}
+	      {this.state.fightwinner}
+	      </div>);
       } else {
 
     return (
