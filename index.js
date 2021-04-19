@@ -67,7 +67,8 @@ constructor() {
 	activemoves: [],
 	switches: [],
 	fightfinished: "",
-	fightwinner: ""
+	fightwinner: "",
+	log: []
     }
     this.handleChange = this.handleChange.bind(this);
   }
@@ -96,6 +97,7 @@ constructor() {
     }
 
     setDisplay(json) {
+	this.setState({log: json.log})
 	if ((json.winner == "p1") || (json.winner == "p2")) {
 	    console.log("FIGHT FINISHED")
 	    this.setState({fightfinished: true,fightwinner: json.winner,fightactive: false})
@@ -174,29 +176,21 @@ constructor() {
   }
 handleChange(event) {this.setState({team: event.target.value});}
 
+    renderlog() {
+	    return (<div className="logcol">
+	    {this.state.log.map((value, index) => {
+        return <p>{value}</p>})}
+	    </div>);
+    }
+
   render() {
       if (this.state.fightactive) {
 	return (
 	    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gridGap: 20 }}>
 	    <div><h2>{this.state.activemon}</h2><p>{this.state.activehealth}</p>{this.renderOptions()}</div>
 	    <div><h2>{this.state.foeactive}</h2><p>{this.state.foehealth}</p></div>
-    <div>
-	    <div className="logcol">
-	    <p>LINE1</p><p>line2</p>
-	    <p>LINE1</p><p>line2</p>
-	    <p>LINE1</p><p>line2</p>
-	    <p>LINE1</p><p>line2</p>
-	    <p>LINE1</p><p>line2</p>
-	    <p>LINE1</p><p>line2</p>
-	    <p>LINE1</p><p>line2</p>
-	    <p>LINE1</p><p>line2</p>
-	    <p>LINE1</p><p>line2</p>
-	    <p>LINE1</p><p>line2</p>
-	    <p>LINE1</p><p>line2</p>
-	    <p>LINE1</p><p>line2</p>
-	    <p>LINE1</p><p>line2</p>
-</div>
-	    </div>
+	    {this.renderlog()}
+
   </div>);
       } else if (this.state.fightfinished) {
 	  console.log("printin out that fight finished!")
