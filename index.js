@@ -194,13 +194,21 @@ handleChange(event) {this.setState({team: event.target.value});}
   </div>);
       } else if (this.state.fightfinished) {
 	  console.log("printin out that fight finished!")
-	  return (<div>
+	  return (
+<div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gridGap: 20 }}>
+	    <div>
+	      
 	      Game over!
-	      Congratulations!
 	      Winner is:
 	      {" "}
 	      {this.state.fightwinner}
-	      </div>);
+	      </div>
+	    <div></div>
+	    {this.renderlog()}
+
+  </div>);
+
+
       } else {
 
     return (
