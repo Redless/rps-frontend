@@ -8,3 +8,10 @@ body {
   width: 50%;
   padding: 10px;
 }
+
+.logcol {
+  flex: 1;
+  background: #aaa;
+  overflow-y: scroll;
+  height: 200px;
+}

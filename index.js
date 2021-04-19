@@ -180,7 +180,23 @@ handleChange(event) {this.setState({team: event.target.value});}
 	    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gridGap: 20 }}>
 	    <div><h2>{this.state.activemon}</h2><p>{this.state.activehealth}</p>{this.renderOptions()}</div>
 	    <div><h2>{this.state.foeactive}</h2><p>{this.state.foehealth}</p></div>
-    <div>Column 3{this.state.fightfinished}</div>
+    <div>
+	    <div className="logcol">
+	    <p>LINE1</p><p>line2</p>
+	    <p>LINE1</p><p>line2</p>
+	    <p>LINE1</p><p>line2</p>
+	    <p>LINE1</p><p>line2</p>
+	    <p>LINE1</p><p>line2</p>
+	    <p>LINE1</p><p>line2</p>
+	    <p>LINE1</p><p>line2</p>
+	    <p>LINE1</p><p>line2</p>
+	    <p>LINE1</p><p>line2</p>
+	    <p>LINE1</p><p>line2</p>
+	    <p>LINE1</p><p>line2</p>
+	    <p>LINE1</p><p>line2</p>
+	    <p>LINE1</p><p>line2</p>
+</div>
+	    </div>
   </div>);
       } else if (this.state.fightfinished) {
 	  console.log("printin out that fight finished!")
