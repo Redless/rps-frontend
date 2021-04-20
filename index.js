@@ -104,9 +104,9 @@ constructor() {
 	    return
 	}
 	if (this.props.side == 0) {
-	    this.setState({activemon: json.p1mon,activehealth: json.p1health,foeactive: json.p2mon,foehealth: json.p2health,activemoves: json.p1moves, switches: json.p1switches})
+	    this.setState({activemon: json.p1mon,activehealth: json.p1health,ourStatus: json.p1status,foeactive: json.p2mon,foehealth: json.p2health,foeStatus: json.p2status,activemoves: json.p1moves, switches: json.p1switches})
 	} else {
-	    this.setState({activemon: json.p2mon,activehealth: json.p2health,foeactive: json.p1mon,foehealth: json.p1health,activemoves: json.p2moves, switches: json.p2switches})
+	    this.setState({activemon: json.p2mon,activehealth: json.p2health,ourStatus: json.p2status,foeactive: json.p1mon,foehealth: json.p1health,foeStatus: json.p1status,activemoves: json.p2moves, switches: json.p2switches})
 	}
 	this.setState({fightactive: json.fightactive})
     }
@@ -183,12 +183,19 @@ handleChange(event) {this.setState({team: event.target.value});}
 	    </div>);
     }
 
+    renderStatus(stat) {
+	return (<div>
+	    {stat.map((value,index) => {
+		return <p>{value}</p>})}
+	    </div>);
+    }
+
   render() {
       if (this.state.fightactive) {
 	return (
 	    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gridGap: 20 }}>
-	    <div><h2>{this.state.activemon}</h2><p>{this.state.activehealth}</p>{this.renderOptions()}</div>
-	    <div><h2>{this.state.foeactive}</h2><p>{this.state.foehealth}</p></div>
+	    <div><h2>{this.state.activemon}</h2><p>{this.state.activehealth}</p><p>{this.renderStatus(this.state.ourStatus)}</p>{this.renderOptions()}</div>
+	    <div><h2>{this.state.foeactive}</h2><p>{this.state.foehealth}</p><p>{this.renderStatus(this.state.foeStatus)}</p></div>
 	    {this.renderlog()}
 
   </div>);
