@@ -32,7 +32,7 @@ class Manager extends React.Component {
     }
 
     setPlayerInRoom(room,side) {
-	this.setState({side:side,ingame:true});
+	this.setState({side:side,ingame:true,gamein:room});
 	this.setState({gamein:(<GameViewer side={side}/>)})
     }
 
@@ -58,21 +58,60 @@ constructor() {
     );
 
     this.state = {
-	p1score:0,
-	p2score:0,
+	fightactive: false,
+	team: "",
+	activemon: "",
+	activehealth: 0,
+	foeactive: "",
+	foehealth: 0,
+	activemoves: [],
+	switches: [],
+	fightfinished: "",
+	fightwinner: "",
+	log: []
     }
+    this.handleChange = this.handleChange.bind(this);
   }
 
     tick() {
-      fetch(url).then(response => {return response.json()}).then(json => {this.updateScores(json.p1score,json.p2score)})
+      fetch(url).then(response => {return response.json()}).then(json => {this.setDisplay(json)})
     }
 
-    updateScores(score1,score2){
-	this.setState({p1score:score1,p2score:score2})
+    renderOptions() {
+	if (this.state.activemoves) {
+	return (<div><p>
+	    {this.state.activemoves.map((value, index) => {
+        return <button onClick={() => this.sendMove(index)}>{value}</button>})}</p><p>
+	    {this.state.switches.map((value, index) => {
+        return <button onClick={() => this.sendSwitch(index)}>{value}</button>})}</p>
+	</div>);
+	} else {
+	return (<div>
+	    {this.state.switches.map((value, index) => {
+        return <button onClick={() => this.sendSwitch(index)}>{value}</button>})}
+	</div>);
+
+
+	}
+
+    }
+
+    setDisplay(json) {
+	this.setState({log: json.log})
+	if ((json.winner == "p1") || (json.winner == "p2")) {
+	    console.log("FIGHT FINISHED")
+	    this.setState({fightfinished: true,fightwinner: json.winner,fightactive: false})
+	    return
+	}
+	if (this.props.side == 0) {
+	    this.setState({activemon: json.p1mon,activehealth: json.p1health,ourStatus: json.p1status,foeactive: json.p2mon,foehealth: json.p2health,foeStatus: json.p2status,activemoves: json.p1moves, switches: json.p1switches})
+	} else {
+	    this.setState({activemon: json.p2mon,activehealth: json.p2health,ourStatus: json.p2status,foeactive: json.p1mon,foehealth: json.p1health,foeStatus: json.p1status,activemoves: json.p2moves, switches: json.p2switches})
+	}
+	this.setState({fightactive: json.fightactive})
     }
 
     send(choice) {
-      console.log(this.props.side,choice)
       fetch(url, {
         method:"POST",
         cache: "no-cache",
@@ -88,24 +127,105 @@ constructor() {
 	console.log("sent")
 	console.log(choice)
     }
+    sendMove(move){
+	fetch(url, {
+        method:"POST",
+        cache: "no-cache",
+        headers:{
+            "content_type":"application/json",
+        },
+	    body:JSON.stringify({type:"move",move:move,side:this.props.side})
+        })
+    }
 
-  renderOptionButton(option) {
+    sendSwitch(mon){
+	fetch(url, {
+        method:"POST",
+        cache: "no-cache",
+        headers:{
+            "content_type":"application/json",
+        },
+	    body:JSON.stringify({type:"swap",mon:mon,side:this.props.side})
+        })
+    }
+
+    sendteam() {
+	fetch(url, {
+        method:"POST",
+        cache: "no-cache",
+        headers:{
+            "content_type":"application/json",
+        },
+	    body:JSON.stringify({type:"team",side:this.props.side,...JSON.parse(this.state.team)})
+        }
+    ).then(response => {
+    return response.json()
+  })
+  .then(json => {console.log(json)})
+	console.log("sent")
+    }
+
+
+
+  renderSubmitButton() {
       return (
-	  <button className="optionbutton" onClick={() => this.send(option)}>
-	  {option}
+	  <button className="submitbutton" onClick={() => this.sendteam()}>
+	  Submit Team
 	  </button>)
 
   }
+handleChange(event) {this.setState({team: event.target.value});}
+
+    renderlog() {
+	    return (<div className="logcol">
+	    {this.state.log.map((value, index) => {
+        return <p>{value}</p>})}
+	    </div>);
+    }
+
+    renderStatus(stat) {
+	return (<div>
+	    {stat.map((value,index) => {
+		return <p>{value}</p>})}
+	    </div>);
+    }
 
   render() {
+      if (this.state.fightactive) {
+	return (
+	    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gridGap: 20 }}>
+	    <div><h2>{this.state.activemon}</h2><p>{this.state.activehealth}</p><p>{this.renderStatus(this.state.ourStatus)}</p>{this.renderOptions()}</div>
+	    <div><h2>{this.state.foeactive}</h2><p>{this.state.foehealth}</p><p>{this.renderStatus(this.state.foeStatus)}</p></div>
+	    {this.renderlog()}
+
+  </div>);
+      } else if (this.state.fightfinished) {
+	  console.log("printin out that fight finished!")
+	  return (
+<div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gridGap: 20 }}>
+	    <div>
+	      
+	      Game over!
+	      Winner is:
+	      {" "}
+	      {this.state.fightwinner}
+	      </div>
+	    <div></div>
+	    {this.renderlog()}
+
+  </div>);
+
+
+      } else {
+
     return (
       <div className="game">
-	{this.renderOptionButton("rock")}
-	{this.renderOptionButton("paper")}
-	{this.renderOptionButton("scissors")}
-	{this.state.p1score}{this.state.p2score}
+	{"Paste Team Below"}
+	<textarea value={this.state.team} onChange={this.handleChange} />
+	{this.renderSubmitButton()}
       </div>
     );
+      }
   }
 }
 
