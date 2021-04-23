@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 let url = 
-    "http://127.0.0.1:5000/";
-    //"https://littlerps.herokuapp.com/";
+    //"http://127.0.0.1:5000/";
+    "https://littlerps.herokuapp.com/";
 
 class Room extends React.Component {
     render() {
@@ -79,11 +79,11 @@ constructor() {
 
     renderOptions() {
 	if (this.state.activemoves) {
-	return (<div>
+	return (<div><p>
 	    {this.state.activemoves.map((value, index) => {
-        return <button onClick={() => this.sendMove(index)}>{value}</button>})}
+        return <button onClick={() => this.sendMove(index)}>{value}</button>})}</p><p>
 	    {this.state.switches.map((value, index) => {
-        return <button onClick={() => this.sendSwitch(index)}>{value}</button>})}
+        return <button onClick={() => this.sendSwitch(index)}>{value}</button>})}</p>
 	</div>);
 	} else {
 	return (<div>
