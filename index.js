@@ -3,13 +3,14 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 let url = 
-    //"http://127.0.0.1:5000/";
-    "https://littlerps.herokuapp.com/";
+    "http://127.0.0.1:5000/";
+    //"https://littlerps.herokuapp.com/";
 
 class Room extends React.Component {
     render() {
 	return (
 	    <div>
+		room {this.props.number}
 	        <button className="side" onClick={() => this.props.onClick(0)}>
 	            {"Join Red Team"}
 	        </button>
@@ -24,16 +25,49 @@ class Room extends React.Component {
 class Manager extends React.Component {
     constructor(){
 	super();
+
+
+	this.timerID = setInterval(
+	    () => this.tick(),
+	    1000
+	);
+
 	this.state = {
 	    ingame:false,
 	    gamein:null,
-	    side:0,
+	    numrooms:3
 	}
     }
 
+    tick() {
+      fetch(url,{method:"POST",
+        cache: "no-cache",
+        headers:{
+            "content_type":"application/json",
+        },
+	  body:'{"type":"getrooms"}'}).then(response => {return response.json()}).then(json => {this.setDisplay(json)})
+    }
+
+    setDisplay(json) {
+	this.setState({numrooms:json.numrooms})
+	console.log("set number rooms")
+    }
+
     setPlayerInRoom(room,side) {
-	this.setState({side:side,ingame:true,gamein:room});
-	this.setState({gamein:(<GameViewer side={side}/>)})
+	this.setState({ingame:true});
+	this.setState({gamein:(<GameViewer side={side} room={room}/>)})
+    }
+
+    requestnewroom(){
+	fetch(url, {
+        method:"POST",
+        cache: "no-cache",
+        headers:{
+            "content_type":"application/json",
+        },
+	    body:JSON.stringify({type:"makeroom"})
+        })
+
     }
 
     render(){
@@ -42,10 +76,18 @@ class Manager extends React.Component {
 		{this.state.gamein}
 		</div>)
 	} else {
-	    return (
-		<Room onClick={(side) => this.setPlayerInRoom(0,side)}/>
-	    )
-	}
+	    var foo = [];
+	    for (var i = 1; i <= this.state.numrooms; i++) {
+	       foo.push(i);
+	    }
+	    return (<div>
+	        <button onClick={() => this.requestnewroom()}>
+	            {"make new room"}
+	        </button>
+		{foo.map((value, index) => {
+        return 	<Room onClick={(side) => this.setPlayerInRoom(index,side)} number={index}/>
+		})}</div>);}
+	
     }
 }
 
@@ -74,7 +116,13 @@ constructor() {
   }
 
     tick() {
-      fetch(url).then(response => {return response.json()}).then(json => {this.setDisplay(json)})
+      fetch(url,{method:"POST",
+        cache: "no-cache",
+        headers:{
+            "content_type":"application/json",
+        },
+
+	  body:JSON.stringify({room:this.props.room,type:"getinfo"})}).then(response => {return response.json()}).then(json => {this.setDisplay(json)})
     }
 
     renderOptions() {
@@ -118,7 +166,7 @@ constructor() {
         headers:{
             "content_type":"application/json",
         },
-	  body:JSON.stringify({side:this.props.side,move:choice})
+	  body:JSON.stringify({side:this.props.side,move:choice,room:this.props.room})
         }
     ).then(response => {
     return response.json()
@@ -134,7 +182,7 @@ constructor() {
         headers:{
             "content_type":"application/json",
         },
-	    body:JSON.stringify({type:"move",move:move,side:this.props.side})
+	    body:JSON.stringify({type:"move",move:move,side:this.props.side,room:this.props.room})
         })
     }
 
@@ -145,7 +193,7 @@ constructor() {
         headers:{
             "content_type":"application/json",
         },
-	    body:JSON.stringify({type:"swap",mon:mon,side:this.props.side})
+	    body:JSON.stringify({type:"swap",mon:mon,room:this.props.room,side:this.props.side})
         })
     }
 
@@ -156,7 +204,7 @@ constructor() {
         headers:{
             "content_type":"application/json",
         },
-	    body:JSON.stringify({type:"team",side:this.props.side,...JSON.parse(this.state.team)})
+	    body:JSON.stringify({type:"team",room:this.props.room,side:this.props.side,...JSON.parse(this.state.team)})
         }
     ).then(response => {
     return response.json()
