@@ -35,7 +35,7 @@ class Manager extends React.Component {
 	this.state = {
 	    ingame:false,
 	    gamein:null,
-	    numrooms:3
+	    numrooms:0
 	}
     }
 
@@ -110,7 +110,11 @@ constructor() {
 	switches: [],
 	fightfinished: "",
 	fightwinner: "",
-	log: []
+	log: [],
+	foemons: [],
+	foehealths: [],
+	ourmons: [],
+	ourhealths: []
     }
     this.handleChange = this.handleChange.bind(this);
   }
@@ -152,9 +156,9 @@ constructor() {
 	    return
 	}
 	if (this.props.side == 0) {
-	    this.setState({activemon: json.p1mon,activehealth: json.p1health,ourStatus: json.p1status,foeactive: json.p2mon,foehealth: json.p2health,foeStatus: json.p2status,activemoves: json.p1moves, switches: json.p1switches})
+	    this.setState({activemon: json.p1mon,activehealth: json.p1health,ourStatus: json.p1status,foeactive: json.p2mon,foehealth: json.p2health,foeStatus: json.p2status,activemoves: json.p1moves, switches: json.p1switches, foemons: json.p2mons, foehealths: json.p2healths, ourmons: json.p1mons, ourhealths: json.p1healths})
 	} else {
-	    this.setState({activemon: json.p2mon,activehealth: json.p2health,ourStatus: json.p2status,foeactive: json.p1mon,foehealth: json.p1health,foeStatus: json.p1status,activemoves: json.p2moves, switches: json.p2switches})
+	    this.setState({activemon: json.p2mon,activehealth: json.p2health,ourStatus: json.p2status,foeactive: json.p1mon,foehealth: json.p1health,foeStatus: json.p1status,activemoves: json.p2moves, switches: json.p2switches, foemons: json.p1mons, foehealths: json.p1healths, ourmons: json.p2mons, ourhealths: json.p2healths})
 	}
 	this.setState({fightactive: json.fightactive})
     }
@@ -238,12 +242,17 @@ handleChange(event) {this.setState({team: event.target.value});}
 	    </div>);
     }
 
+    renderMonsAndHealth(mons,healths){
+	return (<div>
+	    {mons.map((value, index) => {return <p>{value}{"  "}{healths[index]}</p>})}</div>);
+    }
+
   render() {
       if (this.state.fightactive) {
 	return (
 	    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gridGap: 20 }}>
-	    <div><h2>{this.state.activemon}</h2><p>{this.state.activehealth}</p><p>{this.renderStatus(this.state.ourStatus)}</p>{this.renderOptions()}</div>
-	    <div><h2>{this.state.foeactive}</h2><p>{this.state.foehealth}</p><p>{this.renderStatus(this.state.foeStatus)}</p></div>
+	    <div><h2>{this.state.activemon}</h2><p>{this.state.activehealth}</p><p>{this.renderStatus(this.state.ourStatus)}</p>{this.renderOptions()}{this.renderMonsAndHealth(this.state.ourmons,this.state.ourhealths)}</div>
+	    <div><h2>{this.state.foeactive}</h2><p>{this.state.foehealth}</p><p>{this.renderStatus(this.state.foeStatus)}</p>{this.renderMonsAndHealth(this.state.foemons,this.state.foehealths)}</div>
 	    {this.renderlog()}
 
   </div>);
