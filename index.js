@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 let url = 
-    "http://127.0.0.1:5000/";
-    //"https://littlerps.herokuapp.com/";
+    //"http://127.0.0.1:5000/";
+    "https://littlerps.herokuapp.com/";
 
 class Room extends React.Component {
     render() {
