@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 let url = 
-    //"http://127.0.0.1:5000/";
-    "https://littlerps.herokuapp.com/";
+    "http://127.0.0.1:5000/";
+    //"https://littlerps.herokuapp.com/";
 
 class Room extends React.Component {
     render() {
@@ -156,9 +156,9 @@ constructor() {
 	    return
 	}
 	if (this.props.side == 0) {
-	    this.setState({activemon: json.p1mon,activehealth: json.p1health,ourStatus: json.p1status,foeactive: json.p2mon,foehealth: json.p2health,foeStatus: json.p2status,activemoves: json.p1moves, switches: json.p1switches, foemons: json.p2mons, foehealths: json.p2healths, ourmons: json.p1mons, ourhealths: json.p1healths})
+	    this.setState({activemon: json.p1mon,activehealth: json.p1health/4,ourStatus: json.p1status,foeactive: json.p2mon,foehealth: json.p2health/4,foeStatus: json.p2status,activemoves: json.p1moves, switches: json.p1switches, foemons: json.p2mons, foehealths: json.p2healths, ourmons: json.p1mons, ourhealths: json.p1healths})
 	} else {
-	    this.setState({activemon: json.p2mon,activehealth: json.p2health,ourStatus: json.p2status,foeactive: json.p1mon,foehealth: json.p1health,foeStatus: json.p1status,activemoves: json.p2moves, switches: json.p2switches, foemons: json.p1mons, foehealths: json.p1healths, ourmons: json.p2mons, ourhealths: json.p2healths})
+	    this.setState({activemon: json.p2mon,activehealth: json.p2health/4,ourStatus: json.p2status,foeactive: json.p1mon,foehealth: json.p1health/4,foeStatus: json.p1status,activemoves: json.p2moves, switches: json.p2switches, foemons: json.p1mons, foehealths: json.p1healths, ourmons: json.p2mons, ourhealths: json.p2healths})
 	}
 	this.setState({fightactive: json.fightactive})
     }
@@ -244,7 +244,7 @@ handleChange(event) {this.setState({team: event.target.value});}
 
     renderMonsAndHealth(mons,healths){
 	return (<div>
-	    {mons.map((value, index) => {return <p>{value}{"  "}{healths[index]}</p>})}</div>);
+	    {mons.map((value, index) => {return <p>{value}{"  "}{healths[index]/4}</p>})}</div>);
     }
 
   render() {
